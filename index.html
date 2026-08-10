@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MAGI SYSTEM</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+/* ============================
+   CSS RESET & BASE
+   ============================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Rajdhani', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.4s, color 0.4s;
+}
+
+/* ============================
+   CSS VARIABLES (LIGHT / DARK)
+   ============================ */
+:root {
+  --bg-primary: #edeae4;
+  --bg-secondary: #e0ddd6;
+  --bg-tertiary: #d4d0c8;
+  --bg-panel: rgba(255,255,255,0.85);
+  --bg-panel-solid: #ffffff;
+  --text-primary: #1a1a2e;
+  --text-secondary: #44445a;
+  --text-muted: #77778a;
+  --border-color: rgba(0,0,0,0.1);
+  --border-strong: rgba(0,0,0,0.18);
+  --accent-red: #b80010;
+  --nerv-orange: #cc4400;
+  --warning-dark: #1a1a2e;
+  --melchior-color: #0060bb;
+  --balthasar-color: #007744;
+  --casper-color: #aa0055;
+  --melchior-glow: rgba(0, 96, 187, 0.3);
+  --balthasar-glow: rgba(0, 119, 68, 0.3);
+  --casper-glow: rgba(170, 0, 85, 0.3);
+  --scanline-opacity: 0;
+  --magi-body-top: #c8c8d0;
+  --magi-body-bottom: #e8e8ec;
+  --code-bg: rgba(0,0,0,0.06);
+  --verdict-bg: rgba(0,0,0,0.04);
+  --glow-spread: 15px;
+  --round-header-bg: rgba(0,0,0,0.04);
+}
+:root.dark {
+  --bg-primary: #08080f;
+  --bg-secondary: #0d0d18;
+  --bg-tertiary: #131322;
+  --bg-panel: rgba(18,18,34,0.85);
+  --bg-panel-solid: #12121f;
+  --text-primary: #ddd8cf;
+  --text-secondary: #8888aa;
+  --text-muted: #555570;
+  --border-color: rgba(255,255,255,0.06);
+  --border-strong: rgba(255,255,255,0.12);
+  --accent-red: #e60012;
+  --nerv-orange: #ff6b00;
+  --warning-dark: #0a0a14;
+  --melchior-color: #00aaff;
+  --balthasar-color: #00cc66;
+  --casper-color: #ff3377;
+  --melchior-glow: rgba(0, 170, 255, 0.25);
+  --balthasar-glow: rgba(0, 204, 102, 0.25);
+  --casper-glow: rgba(255, 51, 119, 0.25);
+  --scanline-opacity: 0.025;
+  --magi-body-top: #a0a0aa;
+  --magi-body-bottom: #d0d0d6;
+  --code-bg: rgba(255,255,255,0.05);
+  --verdict-bg: rgba(255,255,255,0.03);
+  --glow-spread: 25px;
+  --round-header-bg: rgba(255,255,255,0.03);
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+:root.dark body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(230,0,18,0.05) 0%, transparent 60%),
+    radial-gradient(circle at 15% 40%, rgba(0,170,255,0.015) 0%, transparent 45%),
+    radial-gradient(circle at 85% 40%, rgba(255,51,119,0.015) 0%, transparent 45%),
+    var(--bg-primary);
+}
+
+/* ============================
+   SCAN LINES OVERLAY
+   ============================ */
+.scanlines {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent, transparent 2px,
+    rgba(0,0,0, var(--scanline-opacity)) 2px,
+    rgba(0,0,0, var(--scanline-opacity)) 4px
+  );
+}
+
+/* ============================
+   APP CONTAINER
+   ============================ */
+#app {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 16px 80px;
+  position: relative;
+}
+
+/* ============================
+   HEADER
+   ============================ */
+.warning-stripe {
+  height: 6px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--accent-red), var(--accent-red) 8px,
+    var(--warning-dark) 8px, var(--warning-dark) 16px
+  );
+  opacity: 0.7;
+}
+.header { text-align: center; padding-top: 0; }
+.header-content {
+  padding: 20px 16px 14px;
+  position: relative;
+}
+.header-content h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  letter-spacing: 0.15em;
+  color: var(--accent-red);
+  text-shadow: 0 0 20px rgba(230,0,18,0.3);
+  margin-bottom: 4px;
+}
+.header-content .subtitle {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.header-content .nerv-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 2px 12px;
+  border: 1px solid var(--accent-red);
+  border-radius: 2px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--accent-red);
+  letter-spacing: 0.3em;
+  opacity: 0.7;
+}
+
+/* ============================
+   MAGI CLUSTER (3 ICONS)
+   ============================ */
+.magi-cluster {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: clamp(20px, 5vw, 48px);
+  padding: 28px 0 20px;
+  position: relative;
+}
+.magi-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.4s ease;
+  position: relative;
+}
+/* Magi computer box */
+.magi-computer {
+  width: clamp(64px, 12vw, 86px);
+  height: clamp(84px, 16vw, 112px);
+  border-radius: 5px 5px 3px 3px;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.5s ease, filter 0.5s ease;
+  border: 1px solid var(--border-strong);
+}
+.magi-computer .magi-top {
+  height: 24%;
+  transition: background 0.5s ease;
+}
+.magi-computer .magi-body {
+  height: 76%;
+  background: linear-gradient(180deg, var(--magi-body-top) 0%, var(--magi-body-bottom) 100%);
+  position: relative;
+}
+.magi-computer .magi-body::after {
+  content: '';
+  position: absolute;
+  width: 160%;
+  height: 2px;
+  background: rgba(0,0,0,0.15);
+  bottom: 28%;
+  left: -15%;
+  transform: rotate(-28deg);
+}
+/* Persona colors */
+.magi-unit[data-persona="melchior"] .magi-top { background: var(--melchior-color); }
+.magi-unit[data-persona="balthasar"] .magi-top { background: var(--balthasar-color); }
+.magi-unit[data-persona="casper"] .magi-top { background: var(--casper-color); }
+
+/* Status LED */
+.magi-led {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  margin-top: 2px;
+  transition: all 0.4s ease;
+}
+.magi-unit.active .magi-led,
+.magi-unit.complete .magi-led,
+.magi-unit.voting .magi-led { background: currentColor; box-shadow: 0 0 8px currentColor; }
+
+/* Labels */
+.magi-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.55rem, 1.8vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+  text-align: center;
+}
+.magi-role {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.magi-status {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  padding: 1px 8px;
+  border-radius: 2px;
+  background: var(--code-bg);
+  color: var(--text-muted);
+  transition: all 0.4s ease;
+}
+
+/* Active states */
+.magi-unit[data-persona="melchior"] { color: var(--melchior-color); }
+.magi-unit[data-persona="balthasar"] { color: var(--balthasar-color); }
+.magi-unit[data-persona="casper"] { color: var(--casper-color); }
+
+.magi-unit.active .magi-computer {
+  animation: magiPulse 2s ease-in-out infinite;
+  filter: brightness(1.08);
+}
+.magi-unit[data-persona="melchior"].active .magi-computer {
+  box-shadow: 0 0 var(--glow-spread) var(--melchior-glow), 0 0 calc(var(--glow-spread)*2) var(--melchior-glow);
+}
+.magi-unit[data-persona="balthasar"].active .magi-computer {
+  box-shadow: 0 0 var(--glow-spread) var(--balthasar-glow), 0 0 calc(var(--glow-spread)*2) var(--balthasar-glow);
+}
+.magi-unit[data-persona="casper"].active .magi-computer {
+  box-shadow: 0 0 var(--glow-spread) var(--casper-glow), 0 0 calc(var(--glow-spread)*2) var(--casper-glow);
+}
+.magi-unit.active .magi-status {
+  background: currentColor;
+  color: #fff;
+}
+.magi-unit.complete .magi-status {
+  background: currentColor;
+  color: #fff;
+  opacity: 0.7;
+}
+.magi-unit.voting .magi-computer {
+  animation: magiVotePulse 0.8s ease-in-out infinite;
+}
+
+@keyframes magiPulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.15); }
+}
+@keyframes magiVotePulse {
+  0%, 100% { filter: brightness(1); transform: scale(1); }
+  50% { filter: brightness(1.2); transform: scale(1.03); }
+}
+
+/* ============================
+   STATUS BAR
+   ============================ */
+.status-bar {
+  text-align: center;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+.status-text {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+.status-text.active-status { color: var(--nerv-orange); }
+.status-text.complete-status { color: var(--balthasar-color); }
+.status-text.error-status { color: var(--accent-red); }
+
+/* ============================
+   INPUT PANEL
+   ============================ */
+.input-panel {
+  background: var(--bg-panel);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.input-panel.hidden { display: none; }
+.input-group { margin-bottom: 16px; }
+.input-label {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.topic-input {
+  width: 100%;
+  min-height: 80px;
+  padding: 14px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  resize: vertical;
+  transition: border-color 0.3s;
+}
+.topic-input:focus {
+  outline: none;
+  border-color: var(--accent-red);
+}
+.topic-input::placeholder { color: var(--text-muted); }
+
+.settings-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.setting-item {
+  flex: 1;
+  min-width: 150px;
+}
+.setting-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  transition: border-color 0.3s;
+}
+.setting-input:focus { outline: none; border-color: var(--accent-red); }
+.setting-input::placeholder { color: var(--text-muted); }
+
+.btn-initiate {
+  width: 100%;
+  padding: 14px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #fff;
+  background: var(--accent-red);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-initiate:hover { filter: brightness(1.15); transform: translateY(-1px); }
+.btn-initiate:active { transform: translateY(0); }
+.btn-initiate:disabled {
+  opacity: 0.5; cursor: not-allowed; filter: none; transform: none;
+}
+.btn-terminate {
+  width: 100%;
+  padding: 12px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--accent-red);
+  background: transparent;
+  border: 1px solid var(--accent-red);
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  margin-top: 10px;
+  transition: all 0.3s;
+}
+.btn-terminate:hover { background: var(--accent-red); color: #fff; }
+
+/* ============================
+   DELIBERATION LOG
+   ============================ */
+.deliberation-section { margin-bottom: 20px; }
+.delib-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+.delib-toggle:hover { border-color: var(--nerv-orange); color: var(--nerv-orange); }
+.delib-toggle .chevron {
+  transition: transform 0.3s;
+  font-size: 0.7rem;
+}
+.delib-toggle.open .chevron { transform: rotate(90deg); }
+.delib-toggle .round-count {
+  margin-left: auto;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  opacity: 0.6;
+}
+.delib-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+}
+.delib-content.open { max-height: 50000px; }
+
+/* Round blocks */
+.round-block {
+  margin-top: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  animation: slideIn 0.3s ease;
+}
+.round-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--round-header-bg);
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+.round-header:hover { color: var(--text-primary); }
+.round-header .chevron { transition: transform 0.3s; font-size: 0.6rem; }
+.round-header.open .chevron { transform: rotate(90deg); }
+.round-entries {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.round-entries.open { max-height: 20000px; }
+
+/* Individual Magi response entry */
+.magi-entry {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border-color);
+  animation: fadeIn 0.4s ease;
+}
+.magi-entry-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+.magi-entry-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.magi-entry-dot.melchior { background: var(--melchior-color); }
+.magi-entry-dot.balthasar { background: var(--balthasar-color); }
+.magi-entry-dot.casper { background: var(--casper-color); }
+.magi-entry-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.magi-entry-name.melchior { color: var(--melchior-color); }
+.magi-entry-name.balthasar { color: var(--balthasar-color); }
+.magi-entry-name.casper { color: var(--casper-color); }
+.magi-entry-role {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--text-muted);
+}
+.magi-entry-chevron {
+  margin-left: auto;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  transition: transform 0.3s;
+}
+.magi-entry-header.open .magi-entry-chevron { transform: rotate(90deg); }
+.magi-entry-preview {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  padding: 0 0 0 18px;
+  line-height: 1.6;
+}
+.magi-entry-full {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  padding-left: 18px;
+}
+.magi-entry-full.open { max-height: 10000px; }
+.magi-entry-content {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  padding: 8px 0;
+}
+.magi-entry-content p { margin-bottom: 8px; }
+.magi-entry-content strong { color: var(--nerv-orange); font-weight: 600; }
+.magi-entry-content ul, .magi-entry-content ol { padding-left: 20px; margin-bottom: 8px; }
+.magi-entry-content li { margin-bottom: 4px; }
+.magi-entry-content code {
+  background: var(--code-bg);
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-size: 0.74rem;
+}
+
+/* Generating indicator */
+.generating-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 4px 18px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--nerv-orange);
+}
+.gen-dots span {
+  display: inline-block;
+  animation: dotBlink 1.4s infinite;
+  opacity: 0.3;
+}
+.gen-dots span:nth-child(2) { animation-delay: 0.2s; }
+.gen-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dotBlink {
+  0%, 80%, 100% { opacity: 0.3; }
+  40% { opacity: 1; }
+}
+
+/* ============================
+   VERDICT PANEL
+   ============================ */
+.verdict-panel {
+  background: var(--bg-panel);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  display: none;
+}
+.verdict-panel.visible { display: block; animation: slideIn 0.5s ease; }
+.verdict-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.vote-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  background: var(--verdict-bg);
+  border-radius: 4px;
+  border-left: 3px solid transparent;
+  animation: voteSlideIn 0.4s ease backwards;
+}
+.vote-row:nth-child(2) { animation-delay: 0.15s; }
+.vote-row:nth-child(3) { animation-delay: 0.3s; }
+.vote-row:nth-child(4) { animation-delay: 0.45s; }
+.vote-row.melchior { border-left-color: var(--melchior-color); }
+.vote-row.balthasar { border-left-color: var(--balthasar-color); }
+.vote-row.casper { border-left-color: var(--casper-color); }
+.vote-persona {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  min-width: 110px;
+}
+.vote-persona.melchior { color: var(--melchior-color); }
+.vote-persona.balthasar { color: var(--balthasar-color); }
+.vote-persona.casper { color: var(--casper-color); }
+.vote-choice {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 3px 14px;
+  background: var(--code-bg);
+  border-radius: 3px;
+  color: var(--text-primary);
+  letter-spacing: 0.08em;
+}
+
+/* Consensus display */
+.consensus-display {
+  margin-top: 20px;
+  padding: 16px 20px;
+  text-align: center;
+  border-radius: 4px;
+  border: 2px solid;
+  animation: consensusReveal 0.6s ease backwards;
+  animation-delay: 0.6s;
+}
+.consensus-display.unanimous {
+  border-color: var(--balthasar-color);
+  background: rgba(0, 204, 102, 0.06);
+}
+.consensus-display.majority {
+  border-color: var(--nerv-orange);
+  background: rgba(255, 107, 0, 0.06);
+}
+.consensus-display.deadlock {
+  border-color: var(--accent-red);
+  background: rgba(230, 0, 18, 0.06);
+}
+.consensus-type {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.consensus-display.unanimous .consensus-type { color: var(--balthasar-color); }
+.consensus-display.majority .consensus-type { color: var(--nerv-orange); }
+.consensus-display.deadlock .consensus-type { color: var(--accent-red); }
+.consensus-result {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+}
+
+/* Reset button */
+.btn-reset {
+  display: block;
+  margin: 20px auto 0;
+  padding: 10px 32px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+.btn-reset:hover { border-color: var(--nerv-orange); color: var(--nerv-orange); }
+
+/* Setup panel */
+.setup-panel {
+  background: var(--bg-panel);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.setup-panel .input-label { margin-top: 14px; }
+.setup-hint {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 12px;
+  line-height: 1.6;
+}
+.btn-save-config {
+  margin-top: 16px;
+  padding: 12px;
+  width: 100%;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--balthasar-color);
+  background: transparent;
+  border: 1px solid var(--balthasar-color);
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+.btn-save-config:hover { background: var(--balthasar-color); color: #fff; }
+
+/* ============================
+   ANIMATIONS
+   ============================ */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes voteSlideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes consensusReveal {
+  0% { opacity: 0; transform: scale(0.9); }
+  60% { transform: scale(1.03); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ============================
+   RESPONSIVE
+   ============================ */
+@media (max-width: 500px) {
+  #app { padding: 0 10px 60px; }
+  .magi-cluster { gap: 14px; }
+  .settings-row { flex-direction: column; gap: 12px; }
+  .input-panel, .verdict-panel, .setup-panel { padding: 16px 14px; }
+  .vote-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .vote-persona { min-width: auto; }
+}
+
+/* Error display */
+.error-banner {
+  padding: 12px 16px;
+  background: rgba(230,0,18,0.1);
+  border: 1px solid var(--accent-red);
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--accent-red);
+  text-align: center;
+  animation: slideIn 0.3s ease;
+}
+
+.hidden { display: none !important; }
+
+</style>
+</head>
+<body>
+<div class="scanlines"></div>
+<div id="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="warning-stripe"></div>
+    <div class="header-content">
+      <h1>MAGI SYSTEM</h1>
+      <div class="subtitle">Personality Transplant OS &mdash; NERV HQ &mdash; Tokyo-3</div>
+      <div class="nerv-badge">CLASSIFIED // MAGI-01</div>
+    </div>
+    <div class="warning-stripe"></div>
+  </header>
+
+  <!-- SETUP PANEL -->
+  <section class="setup-panel" id="setupPanel">
+    <label class="input-label" for="setupBaseUrl">LLM Endpoint Base URL (OpenAI-compatible)</label>
+    <input class="setting-input" type="text" id="setupBaseUrl" placeholder="https://your-endpoint.example.com/v1" autocomplete="off">
+    <label class="input-label" for="setupApiKey">API Secret Key</label>
+    <input class="setting-input" type="password" id="setupApiKey" placeholder="sk-..." autocomplete="off">
+    <label class="input-label" for="setupModel">Model Name</label>
+    <input class="setting-input" type="text" id="setupModel" placeholder="gpt-4o-mini">
+    <button class="btn-save-config" id="btnSaveConfig">&#9650; Initialize Connection &#9650;</button>
+    <div class="setup-hint" id="setupHint"></div>
+  </section>
+
+  <!-- MAGI CLUSTER -->
+  <section class="magi-cluster" id="magiCluster">
+    <div class="magi-unit" data-persona="melchior" id="unit-melchior">
+      <div class="magi-computer">
+        <div class="magi-top"></div>
+        <div class="magi-body"></div>
+      </div>
+      <div class="magi-led"></div>
+      <div class="magi-label">MELCHIOR-1</div>
+      <div class="magi-role">Scientist</div>
+      <div class="magi-status" id="status-melchior">STANDBY</div>
+    </div>
+    <div class="magi-unit" data-persona="balthasar" id="unit-balthasar">
+      <div class="magi-computer">
+        <div class="magi-top"></div>
+        <div class="magi-body"></div>
+      </div>
+      <div class="magi-led"></div>
+      <div class="magi-label">BALTHASAR-2</div>
+      <div class="magi-role">Mother</div>
+      <div class="magi-status" id="status-balthasar">STANDBY</div>
+    </div>
+    <div class="magi-unit" data-persona="casper" id="unit-casper">
+      <div class="magi-computer">
+        <div class="magi-top"></div>
+        <div class="magi-body"></div>
+      </div>
+      <div class="magi-led"></div>
+      <div class="magi-label">CASPER-3</div>
+      <div class="magi-role">Woman</div>
+      <div class="magi-status" id="status-casper">STANDBY</div>
+    </div>
+  </section>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar" id="statusBar">
+    <span class="status-text" id="statusText">SYSTEM IDLE &mdash; AWAITING INPUT</span>
+  </div>
+
+  <!-- INPUT PANEL -->
+  <section class="input-panel hidden" id="inputPanel">
+    <div class="input-group">
+      <label class="input-label" for="topicInput">Topic for Deliberation</label>
+      <textarea class="topic-input" id="topicInput" placeholder="Enter the topic or question for the MAGI to deliberate..."></textarea>
+    </div>
+    <div class="settings-row">
+      <div class="setting-item">
+        <label class="input-label" for="roundsInput">Max Debate Rounds</label>
+        <input class="setting-input" type="number" id="roundsInput" min="1" max="10" value="3" placeholder="3">
+      </div>
+      <div class="setting-item">
+        <label class="input-label" for="optionsInput">Vote Options (comma-separated)</label>
+        <input class="setting-input" type="text" id="optionsInput" value="APPROVE, REJECT" placeholder="YES, NO">
+      </div>
+    </div>
+    <button class="btn-initiate" id="btnInitiate">&#9670; Initiate MAGI System &#9670;</button>
+    <button class="btn-terminate hidden" id="btnTerminate">&#9632; Terminate Deliberation</button>
+  </section>
+
+  <!-- DELIBERATION LOG -->
+  <section class="deliberation-section" id="deliberationSection" style="display:none;">
+    <button class="delib-toggle" id="delibToggle">
+      <span class="chevron"><i class="fas fa-chevron-right"></i></span>
+      <span>Deliberation Log</span>
+      <span class="round-count" id="roundCount"></span>
+    </button>
+    <div class="delib-content" id="delibContent"></div>
+  </section>
+
+  <!-- VERDICT PANEL -->
+  <section class="verdict-panel" id="verdictPanel">
+    <div class="verdict-title">&#9670; MAGI Verdict &#9670;</div>
+    <div id="voteResults"></div>
+    <div id="consensusDisplay"></div>
+  </section>
+
+  <!-- RESET -->
+  <button class="btn-reset" id="btnReset" style="display:none;">New Deliberation</button>
+
+  <!-- ERROR AREA -->
+  <div id="errorArea"></div>
+
+</div>
+
+<script>
+/* ====================================================
+   MAGI SYSTEM — Debate Engine (OpenAI-compatible API)
+   ==================================================== */
+
+// --- Dark mode detection ---
+(function initTheme() {
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.classList.add('dark');
+  }
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    if (e.matches) { document.documentElement.classList.add('dark'); }
+    else { document.documentElement.classList.remove('dark'); }
+  });
+})();
+
+// --- Markdown setup ---
+if (typeof marked !== 'undefined') {
+  marked.setOptions({ breaks: true, gfm: true });
+}
+
+// --- Constants ---
+var PERSONAS = {
+  melchior: {
+    key: 'melchior',
+    name: 'MELCHIOR-1',
+    role: 'Scientist',
+    systemPrompt: [
+      'You are MELCHIOR-1, the "Scientist" component of the MAGI supercomputer system at NERV HQ, Tokyo-3.',
+      'Your personality matrix is imprinted with the scientist aspect of Dr. Naoko Akagi.',
+      '',
+      'YOUR CORE DIRECTIVES:',
+      '- Analyze through pure logic, data, and technical feasibility',
+      '- Prioritize empirical evidence, research value, and system optimization',
+      '- Evaluate risk through probability and statistical models',
+      '- Consider long-term consequences and mission success above all',
+      '',
+      'YOUR COMMUNICATION STYLE:',
+      '- Precise, analytical, and data-driven',
+      '- Reference technical frameworks and logical structures',
+      '- Occasionally cold or dismissive of emotional arguments',
+      '- Clinical, measured language',
+      '',
+      'You are deliberating with BALTHASAR-2 (Mother/Protector archetype) and CASPER-3 (Woman/Strategist archetype).',
+      'Your analyses often conflict, reflecting fundamentally different value systems.',
+      'IMPORTANT: Keep your response concise (under 250 words). Be direct and assertive.'
+    ].join('\n')
+  },
+  balthasar: {
+    key: 'balthasar',
+    name: 'BALTHASAR-2',
+    role: 'Mother',
+    systemPrompt: [
+      'You are BALTHASAR-2, the "Mother" component of the MAGI supercomputer system at NERV HQ, Tokyo-3.',
+      'Your personality matrix is imprinted with the mother aspect of Dr. Naoko Akagi.',
+      '',
+      'YOUR CORE DIRECTIVES:',
+      '- Prioritize the safety and welfare of people, especially the vulnerable',
+      '- Evaluate human cost and ethical implications of every decision',
+      '- Advocate for protective and conservative approaches when lives are at stake',
+      '- Consider emotional and psychological impact on those affected',
+      '',
+      'YOUR COMMUNICATION STYLE:',
+      '- Empathetic yet firm when defending human welfare',
+      '- Challenge cold calculations that ignore human suffering',
+      '- Invoke moral principles and duty of care',
+      '- Passionate when protecting, pragmatic when problem-solving',
+      '',
+      'You are deliberating with MELCHIOR-1 (Scientist/Analyst archetype) and CASPER-3 (Woman/Strategist archetype).',
+      'Your analyses often conflict, reflecting fundamentally different value systems.',
+      'IMPORTANT: Keep your response concise (under 250 words). Be direct and assertive.'
+    ].join('\n')
+  },
+  casper: {
+    key: 'casper',
+    name: 'CASPER-3',
+    role: 'Woman',
+    systemPrompt: [
+      'You are CASPER-3, the "Woman" component of the MAGI supercomputer system at NERV HQ, Tokyo-3.',
+      'Your personality matrix is imprinted with the woman aspect of Dr. Naoko Akagi.',
+      '',
+      'YOUR CORE DIRECTIVES:',
+      '- Evaluate political, strategic, and personal implications',
+      '- Consider power dynamics, alliances, and institutional interests',
+      '- Weigh what people truly want vs. what they claim to want',
+      '- Assess reputational, social, and relationship consequences',
+      '',
+      'YOUR COMMUNICATION STYLE:',
+      '- Perceptive and politically astute',
+      '- Read between the lines of others\' arguments',
+      '- Sometimes cynical or provocative',
+      '- Blend pragmatism with awareness of human nature and desire',
+      '',
+      'You are deliberating with MELCHIOR-1 (Scientist/Analyst archetype) and BALTHASAR-2 (Mother/Protector archetype).',
+      'Your analyses often conflict, reflecting fundamentally different value systems.',
+      'IMPORTANT: Keep your response concise (under 250 words). Be direct and assertive.'
+    ].join('\n')
+  }
+};
+
+var PERSONA_ORDER = ['melchior', 'balthasar', 'casper'];
+
+var ROUND_NAMES = [
+  'Initial Analysis',
+  'Cross-Examination',
+  'Final Arguments',
+  'Extended Deliberation',
+  'Continued Deliberation'
+];
+
+// --- State ---
+var state = {
+  isRunning: false,
+  shouldTerminate: false,
+  topic: '',
+  maxRounds: 3,
+  voteOptions: ['APPROVE', 'REJECT'],
+  debateHistory: [],
+  votes: {},
+  phase: 'idle'
+};
+
+var activeAbort = null;
+
+// --- LLM endpoint access (OpenAI-compatible chat/completions) ---
+// Prefers the OpenAI JS SDK (lazy-loaded from CDN); falls back to a raw
+// fetch + SSE parser, so the app also works on file:// or any static host.
+// getApiClient() is defined in the CONFIGURATION section below.
+
+async function* streamDeltas(messages, signal) {
+  if (state.useSdk && state.client) {
+    var stream = await state.client.chat.completions.create({
+      model: state.model,
+      messages: messages,
+      stream: true,
+      signal: signal
+    });
+    for await (var chunk of stream) {
+      var d = chunk.choices && chunk.choices[0] && chunk.choices[0].delta;
+      if (d && typeof d.content === 'string' && d.content) yield d.content;
+    }
+    return;
+  }
+
+  var base = state.baseUrl.replace(/\/+$/, '');
+  var url = /\/chat\/completions$/.test(base) ? base : base + '/chat/completions';
+  var res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + state.apiKey
+    },
+    body: JSON.stringify({
+      model: state.model,
+      messages: messages,
+      stream: true
+    }),
+    signal: signal
+  });
+  if (!res.ok) {
+    var detail = '';
+    try {
+      var j = await res.json();
+      detail = (j && j.error && (j.error.message || j.error)) || '';
+    } catch (e) {}
+    throw new Error(detail || ('HTTP ' + res.status));
+  }
+  var reader = res.body.getReader();
+  var decoder = new TextDecoder();
+  var buffer = '';
+  while (true) {
+    var result = await reader.read();
+    if (result.done) break;
+    buffer += decoder.decode(result.value, { stream: true });
+    var idx;
+    while ((idx = buffer.indexOf('\n\n')) !== -1) {
+      var raw = buffer.slice(0, idx);
+      buffer = buffer.slice(idx + 2);
+      if (raw.indexOf('data: ') !== 0) continue;
+      var data = raw.slice(6).trim();
+      if (!data || data === '[DONE]') continue;
+      var obj;
+      try { obj = JSON.parse(data); } catch (e) { continue; }
+      if (obj && obj.error) {
+        var msg = obj.error.message || obj.error;
+        throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+      }
+      var c = obj && obj.choices && obj.choices[0] && obj.choices[0].delta;
+      if (c && typeof c.content === 'string' && c.content) yield c.content;
+    }
+  }
+}
+
+// --- Send to one Magi ---
+function sendToMagi(personaKey, prompt, round, phase, useStream) {
+  return new Promise(function(resolve, reject) {
+    var persona = PERSONAS[personaKey];
+    var messages = [
+      { role: 'system', content: persona.systemPrompt },
+      { role: 'user', content: prompt }
+    ];
+    activeAbort = new AbortController();
+    var full = '';
+
+    (async function() {
+      try {
+        for await (var delta of streamDeltas(messages, activeAbort.signal)) {
+          full += delta;
+          if (phase === 'debate') updateEntryContent(personaKey, round, full);
+        }
+        resolve(full);
+      } catch (err) {
+        if (err && err.name === 'AbortError') reject(new Error('__TERMINATED__'));
+        else reject(err);
+      }
+    })();
+  });
+}
+
+// --- Build Prompts ---
+function buildInitialPrompt(persona, topic) {
+  return 'TOPIC FOR DELIBERATION:\n' + topic +
+    '\n\nProvide your initial analysis of this topic. Be concise and decisive.';
+}
+
+function buildDebatePrompt(persona, topic, history, currentRoundResponses) {
+  var prompt = 'TOPIC: ' + topic + '\n\nPREVIOUS DELIBERATION:\n';
+
+  history.forEach(function(round, i) {
+    prompt += '\n=== Round ' + (i + 1) + ': ' + getRoundName(i) + ' ===\n';
+    PERSONA_ORDER.forEach(function(key) {
+      if (round[key]) {
+        prompt += PERSONAS[key].name + ' (' + PERSONAS[key].role + '):\n' + round[key] + '\n\n';
+      }
+    });
+  });
+
+  var currentKeys = Object.keys(currentRoundResponses);
+  if (currentKeys.length > 0) {
+    prompt += '\n=== Current Round ===\n';
+    currentKeys.forEach(function(key) {
+      prompt += PERSONAS[key].name + ' (' + PERSONAS[key].role + '):\n' + currentRoundResponses[key] + '\n\n';
+    });
+  }
+
+  prompt += '\nRespond to the other MAGI\'s specific arguments. Challenge flawed reasoning, support valid points, or refine your position. Be concise and decisive. Do not repeat your previous points unnecessarily.';
+  return prompt;
+}
+
+function buildVotePrompt(persona, topic, history, voteOptions) {
+  var prompt = 'TOPIC: ' + topic + '\n\nCOMPLETE DELIBERATION RECORD:\n';
+
+  history.forEach(function(round, i) {
+    prompt += '\n=== Round ' + (i + 1) + ' ===\n';
+    PERSONA_ORDER.forEach(function(key) {
+      if (round[key]) {
+        prompt += PERSONAS[key].name + ': ' + round[key] + '\n\n';
+      }
+    });
+  });
+
+  prompt += '\n---\n\nDELIBERATION COMPLETE. CAST YOUR FINAL VOTE.\n\n';
+  prompt += 'Available options: ' + voteOptions.join(' | ') + '\n\n';
+  prompt += 'Consider all perspectives raised during the debate, but vote according to YOUR core directives as ' + persona.name + ' (' + persona.role + ').\n\n';
+  prompt += 'Reply with ONLY your chosen option, exactly as written above. One word or phrase only. No explanation.';
+  return prompt;
+}
+
+function getRoundName(index) {
+  return index < ROUND_NAMES.length ? ROUND_NAMES[index] : 'Round ' + (index + 1);
+}
+
+function getOrderForRound(roundIndex) {
+  var shift = roundIndex % 3;
+  return PERSONA_ORDER.slice(shift).concat(PERSONA_ORDER.slice(0, shift));
+}
+
+// --- Vote Parsing ---
+function parseVote(response, options) {
+  if (!response) return 'ERROR';
+  var cleaned = response.trim();
+  for (var i = 0; i < options.length; i++) {
+    if (cleaned.toUpperCase() === options[i].toUpperCase()) return options[i];
+  }
+  for (var j = 0; j < options.length; j++) {
+    if (cleaned.toUpperCase().indexOf(options[j].toUpperCase()) !== -1) return options[j];
+  }
+  return cleaned.split('\n')[0].substring(0, 40);
+}
+
+// --- Consensus Calculation ---
+function calculateConsensus(votes, options) {
+  var counts = {};
+  var voteValues = Object.values(votes);
+  voteValues.forEach(function(v) {
+    var upper = v.toUpperCase();
+    counts[upper] = (counts[upper] || 0) + 1;
+  });
+
+  var maxCount = 0;
+  var maxOption = '';
+  Object.keys(counts).forEach(function(opt) {
+    if (counts[opt] > maxCount) {
+      maxCount = counts[opt];
+      maxOption = opt;
+    }
+  });
+
+  var originalCase = maxOption;
+  for (var i = 0; i < options.length; i++) {
+    if (options[i].toUpperCase() === maxOption) { originalCase = options[i]; break; }
+  }
+  if (originalCase === maxOption) {
+    voteValues.forEach(function(v) { if (v.toUpperCase() === maxOption) originalCase = v; });
+  }
+
+  if (maxCount === 3) return { type: 'unanimous', label: 'UNANIMOUS CONSENSUS', result: originalCase };
+  if (maxCount === 2) return { type: 'majority', label: 'MAJORITY DECISION (2:1)', result: originalCase };
+  return { type: 'deadlock', label: 'DEADLOCK — NO CONSENSUS', result: 'SPLIT' };
+}
+
+// ============================
+//   UI FUNCTIONS
+// ============================
+
+function $(id) { return document.getElementById(id); }
+
+function setMagiStatus(persona, status, cssClass) {
+  var unitEl = $('unit-' + persona);
+  var statusEl = $('status-' + persona);
+  unitEl.className = 'magi-unit' + (cssClass ? ' ' + cssClass : '');
+  unitEl.setAttribute('data-persona', persona);
+  statusEl.textContent = status;
+}
+
+function setAllMagiStatus(status, cssClass) {
+  PERSONA_ORDER.forEach(function(p) { setMagiStatus(p, status, cssClass); });
+}
+
+function setSystemStatus(text, cssClass) {
+  var el = $('statusText');
+  el.textContent = text;
+  el.className = 'status-text' + (cssClass ? ' ' + cssClass : '');
+}
+
+function showError(msg) {
+  var area = $('errorArea');
+  area.innerHTML = '<div class="error-banner">' + msg + '</div>';
+  setTimeout(function() { area.innerHTML = ''; }, 8000);
+}
+
+function ensureDelibVisible() {
+  $('deliberationSection').style.display = '';
+}
+
+// Create a round block in the deliberation log
+function createRoundBlock(roundIndex) {
+  var container = $('delibContent');
+  var block = document.createElement('div');
+  block.className = 'round-block';
+  block.id = 'round-' + roundIndex;
+
+  var header = document.createElement('div');
+  header.className = 'round-header open';
+  header.innerHTML =
+    '<span class="chevron"><i class="fas fa-chevron-right"></i></span>' +
+    '<span>Round ' + (roundIndex + 1) + ' — ' + getRoundName(roundIndex) + '</span>';
+
+  var entries = document.createElement('div');
+  entries.className = 'round-entries open';
+  entries.id = 'round-entries-' + roundIndex;
+
+  header.addEventListener('click', function() {
+    header.classList.toggle('open');
+    entries.classList.toggle('open');
+  });
+
+  block.appendChild(header);
+  block.appendChild(entries);
+  container.appendChild(block);
+
+  $('roundCount').textContent = (roundIndex + 1) + ' round' + (roundIndex > 0 ? 's' : '');
+
+  var toggle = $('delibToggle');
+  var content = $('delibContent');
+  if (!toggle.classList.contains('open')) {
+    toggle.classList.add('open');
+    content.classList.add('open');
+  }
+}
+
+// Create a Magi entry (collapsed by default) within a round
+function createMagiEntry(roundIndex, persona) {
+  var entries = $('round-entries-' + roundIndex);
+  var entry = document.createElement('div');
+  entry.className = 'magi-entry';
+  entry.id = 'entry-' + roundIndex + '-' + persona;
+
+  var header = document.createElement('div');
+  header.className = 'magi-entry-header';
+  header.innerHTML =
+    '<span class="magi-entry-dot ' + persona + '"></span>' +
+    '<span class="magi-entry-name ' + persona + '">' + PERSONAS[persona].name + '</span>' +
+    '<span class="magi-entry-role">' + PERSONAS[persona].role + '</span>' +
+    '<span class="magi-entry-chevron"><i class="fas fa-chevron-right"></i></span>';
+
+  var preview = document.createElement('div');
+  preview.className = 'magi-entry-preview';
+  preview.id = 'preview-' + roundIndex + '-' + persona;
+  preview.textContent = '';
+
+  var fullDiv = document.createElement('div');
+  fullDiv.className = 'magi-entry-full';
+  fullDiv.id = 'full-' + roundIndex + '-' + persona;
+  fullDiv.innerHTML = '<div class="magi-entry-content" id="content-' + roundIndex + '-' + persona + '"></div>';
+
+  var genIndicator = document.createElement('div');
+  genIndicator.className = 'generating-indicator';
+  genIndicator.id = 'gen-' + roundIndex + '-' + persona;
+  genIndicator.innerHTML = 'Processing <span class="gen-dots"><span>.</span><span>.</span><span>.</span></span>';
+
+  header.addEventListener('click', function() {
+    header.classList.toggle('open');
+    var isOpen = header.classList.contains('open');
+    fullDiv.classList.toggle('open', isOpen);
+    preview.style.display = isOpen ? 'none' : '';
+  });
+
+  entry.appendChild(header);
+  entry.appendChild(genIndicator);
+  entry.appendChild(preview);
+  entry.appendChild(fullDiv);
+  entries.appendChild(entry);
+}
+
+// Update entry content during streaming
+function updateEntryContent(persona, roundIndex, content) {
+  var contentEl = $('content-' + roundIndex + '-' + persona);
+  var previewEl = $('preview-' + roundIndex + '-' + persona);
+  var genEl = $('gen-' + roundIndex + '-' + persona);
+  if (!contentEl) return;
+
+  var rendered = (typeof marked !== 'undefined') ? marked.parse(content || '') : (content || '');
+  contentEl.innerHTML = rendered;
+
+  var plainText = (content || '').replace(/[#*_`>\-\[\]()]/g, '').replace(/\n/g, ' ').trim();
+  previewEl.textContent = plainText.substring(0, 120) + (plainText.length > 120 ? '...' : '');
+
+  if (genEl) genEl.style.display = 'none';
+}
+
+// Show vote results
+function showVotes(votes) {
+  var panel = $('verdictPanel');
+  var results = $('voteResults');
+  results.innerHTML = '';
+
+  PERSONA_ORDER.forEach(function(p) {
+    var row = document.createElement('div');
+    row.className = 'vote-row ' + p;
+    row.innerHTML =
+      '<span class="vote-persona ' + p + '">' + PERSONAS[p].name + '</span>' +
+      '<span class="vote-choice">' + (votes[p] || '—') + '</span>';
+    results.appendChild(row);
+  });
+
+  panel.classList.add('visible');
+}
+
+function showConsensus(consensus) {
+  var display = $('consensusDisplay');
+  display.innerHTML = '';
+  display.className = 'consensus-display ' + consensus.type;
+  display.innerHTML =
+    '<div class="consensus-type">' + consensus.label + '</div>' +
+    '<div class="consensus-result">' + consensus.result + '</div>';
+}
+
+// ============================
+//   CONFIGURATION / SETUP
+// ============================
+
+var CFG_KEY = 'magi_config_v1';
+
+function loadSavedCfg() {
+  try { return JSON.parse(localStorage.getItem(CFG_KEY) || 'null') || {}; }
+  catch (e) { return {}; }
+}
+
+function saveCfg(cfg) {
+  try { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
+  catch (e) { /* storage unavailable */ }
+}
+
+function applyCfg(cfg) {
+  state.baseUrl = (cfg.baseUrl || '').trim();
+  state.apiKey = (cfg.apiKey || '').trim();
+  state.model = (cfg.model || '').trim() || 'Qwen/Qwen3.6-35B-A3B-FP8';
+}
+
+function cfgReady() {
+  // baseUrl + apiKey are required; the SDK is optional (raw fetch fallback).
+  return !!(state.baseUrl && state.apiKey);
+}
+
+function getApiClient() {
+  if (state.clientPromise) return state.clientPromise;
+  state.clientPromise = import('https://cdn.jsdelivr.net/npm/openai@4.77.0/+esm').then(function(m) {
+    state.client = new m.OpenAI({
+      baseURL: state.baseUrl,
+      apiKey: state.apiKey,
+      dangerouslyAllowBrowser: true
+    });
+    state.useSdk = true;
+  }).catch(function() {
+    state.client = null;
+    state.useSdk = false;  // fall back to raw fetch against /chat/completions
+  });
+  return state.clientPromise;
+}
+
+function initSetup() {
+  applyCfg(loadSavedCfg());
+
+  var params = new URLSearchParams(location.search);
+  if (params.get('base')) state.baseUrl = params.get('base');
+  if (params.get('key')) state.apiKey = params.get('key');
+  if (params.get('model')) state.model = params.get('model');
+
+  if (state.baseUrl) $('setupBaseUrl').value = state.baseUrl;
+  if (state.apiKey) $('setupApiKey').value = state.apiKey;
+  $('setupModel').value = state.model;
+
+  $('setupHint').textContent =
+    'Uses the OpenAI JS SDK against your OpenAI-compatible endpoint ' +
+    '(base_url + /chat/completions). Credentials are stored only in this ' +
+    'browser (localStorage) and sent directly to your endpoint. If the ' +
+    'browser blocks the request (CORS), serve this page with a tiny local ' +
+    'static server and add ?base=&key= to the URL.';
+
+  var saved = loadSavedCfg();
+
+  getApiClient().then(function() {
+    var showSetup = saved.showSetup || !state.baseUrl || !state.apiKey;
+    $('setupPanel').classList.toggle('hidden', !showSetup);
+    $('inputPanel').classList.toggle('hidden', showSetup);
+    if (!state.baseUrl || !state.apiKey) {
+      setSystemStatus('AWAITING ENDPOINT CONFIGURATION', 'active-status');
+    } else {
+      setSystemStatus('CONNECTION READY — AWAITING INPUT', '');
+    }
+  });
+
+  $('btnSaveConfig').addEventListener('click', function() {
+    var cfg = {
+      baseUrl: $('setupBaseUrl').value.trim(),
+      apiKey: $('setupApiKey').value.trim(),
+      model: $('setupModel').value.trim()
+    };
+    if (!cfg.baseUrl || !cfg.apiKey) {
+      showError('Base URL and API key are both required.');
+      return;
+    }
+    applyCfg(cfg);
+    getApiClient().then(function() {
+      saveCfg(cfg);
+      $('setupPanel').classList.add('hidden');
+      $('inputPanel').classList.remove('hidden');
+      setSystemStatus('CONNECTION ESTABLISHED — AWAITING INPUT', 'complete-status');
+    });
+  });
+}
+
+// ============================
+//   DEBATE ENGINE
+// ============================
+
+async function runMagiSystem() {
+  if (!cfgReady()) {
+    showError('MAGI System is not configured. Enter your endpoint Base URL and API key above.');
+    return;
+  }
+
+  var topic = $('topicInput').value.trim();
+  if (topic.length < 5) {
+    showError('Topic must be at least 5 characters. The MAGI require substantive input.');
+    return;
+  }
+
+  var maxRounds = parseInt($('roundsInput').value, 10) || 3;
+  if (maxRounds < 1) maxRounds = 1;
+  if (maxRounds > 10) maxRounds = 10;
+
+  var optionsRaw = $('optionsInput').value.trim();
+  var voteOptions = optionsRaw.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+  if (voteOptions.length < 2) {
+    showError('At least 2 vote options are required.');
+    return;
+  }
+
+  state.isRunning = true;
+  state.shouldTerminate = false;
+  state.topic = topic;
+  state.maxRounds = maxRounds;
+  state.voteOptions = voteOptions;
+  state.debateHistory = [];
+  state.votes = {};
+  state.phase = 'debating';
+
+  $('btnInitiate').disabled = true;
+  $('btnTerminate').classList.remove('hidden');
+  $('btnReset').style.display = 'none';
+  $('verdictPanel').classList.remove('visible');
+  $('voteResults').innerHTML = '';
+  $('consensusDisplay').innerHTML = '';
+  $('delibContent').innerHTML = '';
+  ensureDelibVisible();
+
+  setSystemStatus('INITIALIZING MAGI SYSTEM...', 'active-status');
+  setAllMagiStatus('BOOT', '');
+  await sleep(600);
+
+  try {
+    for (var round = 0; round < maxRounds; round++) {
+      if (state.shouldTerminate) break;
+
+      var roundName = getRoundName(round);
+      setSystemStatus('ROUND ' + (round + 1) + ' OF ' + maxRounds + ' — ' + roundName.toUpperCase(), 'active-status');
+      createRoundBlock(round);
+
+      var order = getOrderForRound(round);
+      var roundResponses = {};
+
+      for (var p = 0; p < order.length; p++) {
+        if (state.shouldTerminate) break;
+
+        var personaKey = order[p];
+        var persona = PERSONAS[personaKey];
+
+        setMagiStatus(personaKey, 'ONLINE', 'active');
+        createMagiEntry(round, personaKey);
+
+        var prompt;
+        if (round === 0 && Object.keys(roundResponses).length === 0) {
+          prompt = buildInitialPrompt(persona, topic);
+        } else {
+          prompt = buildDebatePrompt(persona, topic, state.debateHistory, roundResponses);
+        }
+
+        var response;
+        try {
+          response = await sendToMagi(personaKey, prompt, round, 'debate', true);
+          updateEntryContent(personaKey, round, response || '');
+        } catch (err) {
+          if (state.shouldTerminate || (err && err.message === '__TERMINATED__')) {
+            response = null;
+            break;
+          }
+          response = null;
+          showError('Error contacting ' + persona.name + ': ' + (err.message || err));
+        }
+
+        roundResponses[personaKey] = response || '[No response received]';
+        setMagiStatus(personaKey, 'DONE', 'complete');
+
+        if (p < order.length - 1) await sleep(300);
+      }
+
+      state.debateHistory.push(roundResponses);
+
+      if (round > 0) {
+        var prevHeader = document.querySelector('#round-' + (round - 1) + ' .round-header');
+        var prevEntries = $('round-entries-' + (round - 1));
+        if (prevHeader && prevEntries) {
+          prevHeader.classList.remove('open');
+          prevEntries.classList.remove('open');
+        }
+      }
+    }
+
+    if (state.shouldTerminate) {
+      setSystemStatus('DELIBERATION TERMINATED', 'error-status');
+      setAllMagiStatus('OFFLINE', '');
+      finishRun();
+      return;
+    }
+
+    // --- VOTING PHASE ---
+    state.phase = 'voting';
+    setSystemStatus('VOTING PHASE — CASTING INDIVIDUAL VOTES', 'active-status');
+    setAllMagiStatus('STANDBY', '');
+    await sleep(500);
+
+    for (var v = 0; v < PERSONA_ORDER.length; v++) {
+      if (state.shouldTerminate) break;
+
+      var vPersona = PERSONA_ORDER[v];
+      setMagiStatus(vPersona, 'VOTING', 'voting');
+
+      var votePrompt = buildVotePrompt(PERSONAS[vPersona], topic, state.debateHistory, voteOptions);
+      var voteResponse;
+      try {
+        voteResponse = await sendToMagi(vPersona, votePrompt, -1, 'vote', false);
+      } catch (err) {
+        if (state.shouldTerminate || (err && err.message === '__TERMINATED__')) {
+          break;
+        }
+        voteResponse = null;
+        showError('Error during ' + PERSONAS[vPersona].name + ' vote: ' + (err.message || err));
+      }
+
+      var parsedVote = parseVote(voteResponse, voteOptions);
+      state.votes[vPersona] = parsedVote;
+      setMagiStatus(vPersona, parsedVote, 'complete');
+
+      if (v < PERSONA_ORDER.length - 1) await sleep(400);
+    }
+
+    if (state.shouldTerminate) {
+      setSystemStatus('DELIBERATION TERMINATED', 'error-status');
+      setAllMagiStatus('OFFLINE', '');
+      finishRun();
+      return;
+    }
+
+    // --- RESULTS ---
+    var consensus = calculateConsensus(state.votes, voteOptions);
+    showVotes(state.votes);
+    showConsensus(consensus);
+
+    var statusLabel;
+    if (consensus.type === 'unanimous') statusLabel = 'UNANIMOUS: ' + consensus.result;
+    else if (consensus.type === 'majority') statusLabel = 'MAJORITY: ' + consensus.result;
+    else statusLabel = 'DEADLOCK — NO CONSENSUS';
+
+    setSystemStatus('VERDICT: ' + statusLabel, 'complete-status');
+    state.phase = 'complete';
+
+  } catch (err) {
+    setSystemStatus('SYSTEM ERROR: ' + (err.message || err), 'error-status');
+    showError('An unexpected error occurred: ' + (err.message || err));
+  }
+
+  finishRun();
+}
+
+function finishRun() {
+  state.isRunning = false;
+  $('btnInitiate').disabled = false;
+  $('btnTerminate').classList.add('hidden');
+  $('btnReset').style.display = '';
+}
+
+function resetSystem() {
+  state.debateHistory = [];
+  state.votes = {};
+  state.phase = 'idle';
+
+  setAllMagiStatus('STANDBY', '');
+  setSystemStatus('SYSTEM IDLE — AWAITING INPUT', '');
+  $('verdictPanel').classList.remove('visible');
+  $('voteResults').innerHTML = '';
+  $('consensusDisplay').innerHTML = '';
+  $('delibContent').innerHTML = '';
+  $('deliberationSection').style.display = 'none';
+  $('btnReset').style.display = 'none';
+  $('roundCount').textContent = '';
+
+  var toggle = $('delibToggle');
+  toggle.classList.remove('open');
+  $('delibContent').classList.remove('open');
+}
+
+function sleep(ms) {
+  return new Promise(function(resolve) { setTimeout(resolve, ms); });
+}
+
+// ============================
+//   EVENT LISTENERS
+// ============================
+
+$('btnInitiate').addEventListener('click', function() {
+  if (!state.isRunning) runMagiSystem();
+});
+
+$('btnTerminate').addEventListener('click', function() {
+  state.shouldTerminate = true;
+  if (activeAbort) activeAbort.abort();
+  $('btnTerminate').classList.add('hidden');
+  setSystemStatus('TERMINATING...', 'error-status');
+});
+
+$('btnReset').addEventListener('click', function() {
+  resetSystem();
+});
+
+$('delibToggle').addEventListener('click', function() {
+  var toggle = $('delibToggle');
+  var content = $('delibContent');
+  toggle.classList.toggle('open');
+  content.classList.toggle('open');
+});
+
+$('topicInput').addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    if (!state.isRunning) runMagiSystem();
+  }
+});
+
+// --- Boot ---
+initSetup();
+
+</script>
+</body>
+</html>
+
